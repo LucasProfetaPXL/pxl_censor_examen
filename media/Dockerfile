@@ -1,20 +1,19 @@
 FROM node:22-alpine
-
+RUN apk add --no-cache curl
 WORKDIR /app
 
+# Kopieer de package bestanden om de dependencies te installeren
 COPY package*.json ./
 RUN npm install --only=production
 
-COPY . .
+# Kopieer de server code
+COPY server.js .
 
+# Gebruik een non-root user voor security (eis in veel PROD omgevingen)
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
-
-RUN mkdir -p /media && \
-    chown -R nodejs:nodejs /media
-
 USER nodejs
 
-EXPOSE 8081
+EXPOSE 8080
 
 CMD ["node", "server.js"]
